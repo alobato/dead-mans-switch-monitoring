@@ -4,6 +4,11 @@ Este projeto expande o conceito de Dead Man's Switch para também monitorar **us
 
 Cada servidor envia relatórios periódicos para um servidor hub, que verifica os limites de uso e dispara alertas caso algo esteja anormal.
 
+Agora com:
+- ✅ Autenticação leve via token
+- ✅ Logs históricos por dia
+- ✅ Envio de alerta de recuperação quando o servidor normaliza
+
 ---
 
 ## Como Funciona
