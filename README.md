@@ -104,8 +104,8 @@ AUTH_TOKEN=seu_token_secreto
 
 ```mermaid
 graph TD
-  ServidorA -->|POST a cada 1m (token)| Hub[Servidor Hub /status/:uid]
-  ServidorB -->|POST a cada 1m (token)| Hub
+  ServidorA -->|POST a cada 1m com token| Hub[Servidor Hub /status/:uid]
+  ServidorB -->|POST a cada 1m com token| Hub
   Hub -->|Grava status e log| PastaArquivos
   PastaArquivos -->|cron 1m| CheckStatusScript
   CheckStatusScript -->|Se uso anormal| AlertaNtfy(ntfy.sh Alerta)
