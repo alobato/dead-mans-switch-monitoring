@@ -193,7 +193,7 @@ graph TD
   Hub -->|Grava status| PastaArquivos
   PastaArquivos -->|cron 1m| CheckStatusScript
   CheckStatusScript -->|Se uso anormal| AlertaNtfy(ntfy.sh Alerta)
-  CheckStatusScript -->|Cria .alerted para evitar spam|
+  CheckStatusScript --> AlertMarker[Cria .alerted para evitar spam]
 ```
 
 
