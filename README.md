@@ -8,6 +8,7 @@ Agora com:
 - ✅ Autenticação leve via token
 - ✅ Logs históricos por dia
 - ✅ Envio de alerta de recuperação quando o servidor normaliza
+- ✅ Endpoint de leitura de histórico protegido
 
 ---
 
@@ -27,6 +28,10 @@ Agora com:
     - Se o servidor voltar ao normal, envia um alerta de "recuperação".
     - Usa um arquivo `.alerted` para evitar múltiplos alertas repetidos.
 
+4. **Endpoint de Leitura de Logs**:
+    - Permite consultar o histórico de um servidor por dia.
+    - Protegido com o mesmo token de autenticação.
+
 
 ---
 
@@ -37,6 +42,8 @@ Agora com:
 - Valida token de autenticação.
 - Grava status atual.
 - Grava log histórico.
+- Permite consultar histórico de um servidor:
+  - `GET /logs/:date/:server` (exige token)
 
 ### 2. Script de Verificação (`checkStatus.mjs`)
 
@@ -78,6 +85,7 @@ CPU_LIMIT=85
 MEMORY_LIMIT=90
 DISK_LIMIT=80
 AUTH_TOKEN=seu_token_secreto
+LOGS_PATH=/caminho/para/logs
 ```
 
 
@@ -111,6 +119,7 @@ graph TD
   CheckStatusScript -->|Se uso anormal| AlertaNtfy(ntfy.sh Alerta)
   CheckStatusScript --> AlertMarker[Cria .alerted para evitar spam]
   CheckStatusScript -->|Se normalizou| AlertaRecuperacao(Recuperação via ntfy.sh)
+  Hub -->|Consulta histórica| LogsEndpoint[/logs/:date/:server]
 ```
 
 
