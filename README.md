@@ -8,7 +8,7 @@ Agora com:
 - ✅ Autenticação leve via token
 - ✅ Logs históricos por dia
 - ✅ Envio de alerta de recuperação quando o servidor normaliza
-- ✅ Endpoint de leitura de histórico protegido
+- ✅ Endpoints de leitura de histórico protegidos
 
 ---
 
@@ -28,9 +28,10 @@ Agora com:
     - Se o servidor voltar ao normal, envia um alerta de "recuperação".
     - Usa um arquivo `.alerted` para evitar múltiplos alertas repetidos.
 
-4. **Endpoint de Leitura de Logs**:
-    - Permite consultar o histórico de um servidor por dia.
-    - Protegido com o mesmo token de autenticação.
+4. **Endpoints de Leitura de Logs**:
+    - `GET /logs` → Lista todas as datas disponíveis.
+    - `GET /logs/:date/:server` → Consulta o histórico de um servidor em uma data.
+    - Todos protegidos por autenticação via token.
 
 
 ---
@@ -42,7 +43,8 @@ Agora com:
 - Valida token de autenticação.
 - Grava status atual.
 - Grava log histórico.
-- Permite consultar histórico de um servidor:
+- Permite consultar histórico de um servidor e listar datas:
+  - `GET /logs` (exige token)
   - `GET /logs/:date/:server` (exige token)
 
 ### 2. Script de Verificação (`checkStatus.mjs`)
@@ -81,11 +83,11 @@ curl -X POST https://seu-hub.com/status/monitoring__nome_do_servidor \
 ```bash
 PORT=8000
 DOWNLOADS_PATH=/caminho/para/salvar/status
+LOGS_PATH=/caminho/para/logs
 CPU_LIMIT=85
 MEMORY_LIMIT=90
 DISK_LIMIT=80
 AUTH_TOKEN=seu_token_secreto
-LOGS_PATH=/caminho/para/logs
 ```
 
 
@@ -108,18 +110,31 @@ LOGS_PATH=/caminho/para/logs
 
 ---
 
+## Endpoints Disponíveis
+
+| Rota | Método | O que faz |
+|:-----|:-------|:----------|
+| `/status/:uid` | `POST` | Recebe o status de um servidor |
+| `/logs` | `GET` | Lista todos os dias disponíveis |
+| `/logs/:date/:server` | `GET` | Lê o histórico de um servidor num dia |
+
+**Todos os endpoints exigem Authorization: Bearer Token.**
+
+
+---
+
 ## Fluxo Resumido
 
 ```mermaid
 graph TD
-  ServidorA -->|POST a cada 1m com token| Hub[Servidor Hub /status/:uid]
+  ServidorA -->|POST a cada 1m com token| Hub[Servidor Hub status]
   ServidorB -->|POST a cada 1m com token| Hub
   Hub -->|Grava status e log| PastaArquivos
   PastaArquivos -->|cron 1m| CheckStatusScript
-  CheckStatusScript -->|Se uso anormal| AlertaNtfy(ntfy.sh Alerta)
-  CheckStatusScript --> AlertMarker[Cria .alerted para evitar spam]
-  CheckStatusScript -->|Se normalizou| AlertaRecuperacao(Recuperação via ntfy.sh)
-  Hub -->|Consulta histórica| LogsEndpoint[/logs/:date/:server]
+  CheckStatusScript -->|Se uso anormal| AlertaNtfy[Envia alerta via ntfy.sh]
+  CheckStatusScript --> AlertMarker[Criar arquivo .alerted para evitar spam]
+  CheckStatusScript -->|Se normalizou| AlertaRecuperacao[Envia recuperação via ntfy.sh]
+  Hub -->|Consulta histórica| LogsEndpoint[Endpoints logs e logs por data e servidor]
 ```
 
 
